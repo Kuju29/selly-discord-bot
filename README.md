@@ -1,3 +1,5 @@
+# <img alt='Selly.gg' src='https://i.pi.gy/xLxd.png'>
+
 A simple cross platform bot that leverages Selly's webhook system for discord chat notifications
 
 #### Setup
