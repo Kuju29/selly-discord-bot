@@ -1,0 +1,9 @@
+{
+  "Token": "YourToken",
+  "ChannelID": "ChannelID",
+  "UserID": "YourUserID",
+  "SendToChannel": true,
+  "SendToUser": true,
+  "Port": "8000",
+  "WebhookSecret": "YourSecretParamValue"
+}
