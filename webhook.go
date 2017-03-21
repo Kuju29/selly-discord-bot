@@ -22,11 +22,8 @@ func incomingWebhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Nicer formatting to come
-		message := fmt.Sprintf("Order received of %0.2f %s - %s - https://selly.gg/orders/%s", value, webhook.Currency, webhook.Email, webhook.ID)
-
 		if config.SendToChannel {
-			botInstance.ChannelMessageSend(config.ChannelID, message)
+			botInstance.ChannelMessageSend(config.ChannelID, formatMessage(webhook, value))
 		}
 
 		io.WriteString(w, "Received correctly")
@@ -34,4 +31,15 @@ func incomingWebhook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid secret", http.StatusForbidden)
 		log.Print("warn: Invalid secret attempted")
 	}
+}
+
+func formatMessage(webhook Webhook, value float64) string {
+	log.Print(webhook)
+	switch webhookType := webhook.WebhookType; webhookType {
+	case 1:
+		return fmt.Sprintf("Order received of %0.2f %s - %s - https://selly.gg/orders/%s", value, webhook.Currency, webhook.Email, webhook.ID)
+	case 2:
+		return fmt.Sprintf("PayPal chargeback of %0.2f %s - %s - https://selly.gg/orders/%s", value, webhook.Currency, webhook.Email, webhook.ID)
+	}
+	return "Invalid webhook type"
 }

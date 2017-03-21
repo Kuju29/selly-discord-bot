@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"time"
 )
 
 type Configuration struct {
@@ -31,8 +30,9 @@ type Webhook struct {
 	CryptoValue   interface{} `json:"crypto_value"`
 	CryptoAddress interface{} `json:"crypto_address"`
 	Referral      string      `json:"referral"`
-	CreatedAt     time.Time   `json:"created_at"`
-	UpdatedAt     time.Time   `json:"updated_at"`
+	WebhookType   int         `json:"webhook_type"`
+	CreatedAt     string      `json:"created_at"`
+	UpdatedAt     string      `json:"updated_at"`
 }
 
 type MessageEmbed *discordgo.MessageEmbed
