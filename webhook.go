@@ -13,17 +13,13 @@ func incomingWebhook(w http.ResponseWriter, r *http.Request) {
 	secret := r.URL.Query().Get("secret")
 	if secret == config.WebhookSecret {
 		var webhook Webhook
-		err := json.NewDecoder(r.Body).Decode(&webhook)
-		if err != nil {
-			log.Print("error: Error decoding JSON: " + err.Error())
-			http.Error(w, err.Error(), 400)
-			//return
-		}
+		_ = json.NewDecoder(r.Body).Decode(&webhook)
 
 		value, err := strconv.ParseFloat(webhook.Value, 64)
 		if err != nil {
 			log.Print("error: Error parsing value: " + err.Error())
-			http.Error(w, err.Error(), 500)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		// Nicer formatting to come
@@ -35,7 +31,7 @@ func incomingWebhook(w http.ResponseWriter, r *http.Request) {
 
 		io.WriteString(w, "Received correctly")
 	} else {
-		io.WriteString(w, "Invalid secret")
+		http.Error(w, "Invalid secret", http.StatusForbidden)
 		log.Print("warn: Invalid secret attempted")
 	}
 }

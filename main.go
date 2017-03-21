@@ -14,7 +14,6 @@ var (
 func main() {
 	colog.Register()
 
-	//discord.ChannelMessageSend("292420088236343307", "Test")
 	config = loadConfig()
 	botInstance = botStart()
 
