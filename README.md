@@ -19,13 +19,13 @@ Adjust the `port` (we recommend `80` if possible) and `webhook secret` to your d
 Now go to [Selly](https://selly.gg/products) and edit the products you'd like the bot to notify regarding orders. An example webhook URL with a port of `80` and a secret of `piesarenice` would be:
 
 ```
-http://ip.of.server/webhooks?secret=piesarenice
+http://ip.of.server/webhook?secret=piesarenice
 ```
 
 If the port is not `80`, but in this case `123`, it would be:
 
 ```
-http://ip.of.server:123/webhooks?secret=piesarenice
+http://ip.of.server:123/webhook?secret=piesarenice
 ```
 
 #### Running
