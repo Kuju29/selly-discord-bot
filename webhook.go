@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bwmarrin/discordgo"
 	"io"
 	"log"
 	"net/http"
@@ -23,7 +24,7 @@ func incomingWebhook(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if config.SendToChannel {
-			botInstance.ChannelMessageSend(config.ChannelID, formatMessage(webhook, value))
+			botInstance.ChannelMessageSendEmbed(config.ChannelID, formatMessage(webhook, value))
 		}
 
 		io.WriteString(w, "Received correctly")
@@ -33,13 +34,73 @@ func incomingWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func formatMessage(webhook Webhook, value float64) string {
+func formatMessage(webhook Webhook, value float64) *discordgo.MessageEmbed {
 	log.Print(webhook)
+	embed := new(discordgo.MessageEmbed)
+	fields := make([]*discordgo.MessageEmbedField, 0, 10)
+	thumbnail := new(discordgo.MessageEmbedThumbnail)
+
+	thumbnail.URL = "https://selly.gg/images/apple-touch-icon-180x180.png"
+	embed.Thumbnail = thumbnail
+	embed.Description = webhook.ID
+	embed.URL = fmt.Sprintf("https://selly.gg/orders/%s", webhook.ID)
+
+	// Value
+	valueField := new(discordgo.MessageEmbedField)
+	valueField.Name = "Amount"
+	valueField.Value = fmt.Sprintf("%0.2f %s", value, webhook.Currency)
+	valueField.Inline = true
+
+	// Email
+	emailField := new(discordgo.MessageEmbedField)
+	emailField.Name = "Email"
+	emailField.Value = webhook.Email
+	emailField.Inline = true
+
+	// IP
+	ipField := new(discordgo.MessageEmbedField)
+	ipField.Name = "IP Address"
+	ipField.Value = webhook.IPAddress
+	ipField.Inline = true
+
+	// Country Code
+	countryField := new(discordgo.MessageEmbedField)
+	countryField.Name = "Country Code"
+	countryField.Value = webhook.CountryCode
+	countryField.Inline = true
+
+	// Gateway Code
+	gatewayField := new(discordgo.MessageEmbedField)
+	gatewayField.Name = "Gateway"
+	gatewayField.Value = webhook.Gateway
+	gatewayField.Inline = true
+
+	// Risk Level Code
+	riskLevelField := new(discordgo.MessageEmbedField)
+	riskLevelField.Name = "Risk Level"
+	riskLevelField.Value = fmt.Sprintf("%d", webhook.RiskLevel)
+	riskLevelField.Inline = true
+
+	// Created
+	createdAtField := new(discordgo.MessageEmbedField)
+	createdAtField.Name = "Created At"
+	createdAtField.Value = webhook.CreatedAt
+	createdAtField.Inline = false
+
+	fields = append(fields, valueField)
+	fields = append(fields, emailField)
+	fields = append(fields, countryField)
+	fields = append(fields, ipField)
+	fields = append(fields, gatewayField)
+	fields = append(fields, riskLevelField)
+	fields = append(fields, createdAtField)
+
 	switch webhookType := webhook.WebhookType; webhookType {
 	case 1:
-		return fmt.Sprintf("Order received of %0.2f %s - %s - https://selly.gg/orders/%s", value, webhook.Currency, webhook.Email, webhook.ID)
+		embed.Title = "Order Received"
 	case 2:
-		return fmt.Sprintf("PayPal chargeback of %0.2f %s - %s - https://selly.gg/orders/%s", value, webhook.Currency, webhook.Email, webhook.ID)
+		embed.Title = "PayPal Chargeback"
 	}
-	return "Invalid webhook type"
+	embed.Fields = fields
+	return embed
 }
